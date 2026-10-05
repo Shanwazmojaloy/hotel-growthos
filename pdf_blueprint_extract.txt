@@ -1,0 +1,885 @@
+===== PAGE 1 (obj 1) =====
+Hotel Growth OS — Comprehensive Architecture Blueprint
+Page 1
+HOTEL GROWTH OS
+Comprehensive Architecture Blueprint
+PMS + CRM + Operations OS + Revenue Intelligence + Marketing Automation + AI Agent Layer
+Master architecture for the Hotel Fountain / Hotel Growth OS product direction
+Architecture  Data  Automation  AI  Integrations  Security  SaaS  Roadmap
+
+===== PAGE 2 (obj 24) =====
+Hotel Growth OS — Comprehensive Architecture Blueprint
+Page 2
+1. Executive Architecture
+Hotel Growth OS is not simply a PMS.
+ It is designed as a unified operating and growth layer connecting hotel
+operations, guest relationships, communications, analytics, automation and AI.
+                    HOTEL GROWTH OS
+                          |
+       +------------------+------------------+
+       |                  |                  |
+   OPERATIONS           GROWTH          INTELLIGENCE
+       |                  |                  |
+ Reservations         Marketing          AI Agents
+ Rooms                WhatsApp           Analytics
+ Front Desk           Reviews            Forecasting
+ Housekeeping         Sales              Insights
+ Billing              Campaigns          Reports
+       |                  |                  |
+       +------------------+------------------+
+                          |
+                   DATA / EVENT LAYER
+                          |
+                 Supabase PostgreSQL
+                    + Event History
+                          |
+                    n8n AUTOMATION
+                          |
+       +------------------+------------------+
+       |                  |                  |
+   WhatsApp             Email             AI APIs
+The architecture is intentionally event-driven. The PMS/domain layer remains the transactional source of truth; n8n
+handles orchestration and secondary automation; AI agents operate through controlled tools and approval policies.
+The commercial strategy established for the project is revenue-first: validate the offer and acquire paying hotels before
+building the full autonomous platform.
+2. Six-Layer Product Architecture
+Layer
+Responsibility
+Experience
+Staff workspaces, owner dashboard, guest-facing interfaces, booking interfaces
+Application
+PMS, CRM, reservations, rooms, housekeeping, billing, sales, marketing
+Intelligence
+AI agents, forecasting, recommendations, executive summaries
+Automation
+n8n workflows, triggers, scheduled jobs, integrations
+Data
+PostgreSQL, storage, events, analytics, audit history
+Integration
+WhatsApp, email, SMS, payment, OTA/PMS, POS, accounting, Google Business
+3. Multi-Tenant SaaS Architecture
+Platform
+|
++-- Organization
+    |
+    +-- Hotel A
+    |   +-- Users
+    |   +-- Rooms
+    |   +-- Reservations
+    |   +-- Guests
+    |   +-- Financial data
+    |
+    +-- Hotel B
+    |
+    +-- Hotel C
+    |
+    +-- Platform Administration
+
+===== PAGE 3 (obj 25) =====
+Hotel Growth OS — Comprehensive Architecture Blueprint
+Page 3
+Every major business table should carry organization_id and hotel_id. Supabase Row Level Security should enforce
+tenant isolation rather than relying on frontend filtering.
+Core identity model: Organization 
+®
+ Hotel/Property 
+®
+ Users/Roles/Permissions.
+4. Identity, Roles & Permissions
+Role
+Primary workspace
+Owner
+Executive performance, revenue, reports, growth opportunities
+General Manager
+Operations, staff, revenue, exceptions, AI recommendations
+Front Desk
+Reservations, check-in/out, room assignment, guest service
+Reservations
+Bookings, availability, modifications, cancellations
+Accountant
+Payments, invoices, reconciliation, financial reporting
+Housekeeping
+Room tasks, cleaning, inspections, maintenance flags
+Sales
+Leads, companies, opportunities, proposals, follow-up
+Marketing
+Segments, campaigns, content, reviews
+Read-only Manager
+Reporting and monitoring without mutation rights
+Permission examples: reservation.view/create/edit/cancel; guest.view/edit; billing.view/create/refund;
+housekeeping.assign/complete; reports.view/export; settings.manage; integrations.manage.
+5. Core Data Architecture
+Organization
+Hotel / Property
+User / Role / Permission
+Room / RoomType / RoomStatus
+RatePlan / Rate / Inventory
+Guest / GuestIdentity / GuestPreference / GuestSegment
+GuestInteraction
+Reservation / ReservationGuest / ReservationRoom
+Stay / CheckIn / CheckOut
+Folio / FolioItem / Payment / Refund / Invoice
+HousekeepingTask / MaintenanceTicket
+Lead / Company / SalesOpportunity / Proposal / Contract
+Campaign / Message / Conversation / Template
+Review / ReviewResponse
+Automation / Workflow / WorkflowExecution
+AIConversation / AIRecommendation / AIAction / AIApproval
+Report / Metric / Dashboard
+Integration / IntegrationCredential / Webhook / WebhookEvent
+AuditLog
+Supabase/PostgreSQL is the initial transactional source of truth. Object storage is used for invoices, reports, contracts,
+exports and other large documents.
+6. PMS / Reservation Engine
+Inquiry
+
+===== PAGE 4 (obj 26) =====
+Hotel Growth OS — Comprehensive Architecture Blueprint
+Page 4
+  
+¯
+Availability Search
+  
+¯
+Rate Selection
+  
+¯
+Guest Details
+  
+¯
+Reservation Created
+  
+¯
+Payment / Deposit
+  
+¯
+Confirmation
+  
+¯
+Pre-arrival
+  
+¯
+Check-in
+  
+¯
+In-house
+  
+¯
+Check-out
+  
+¯
+Post-stay
+  
+¯
+Repeat / Loyalty
+Critical rule: inventory must have one authoritative source. Creating or modifying a reservation should atomically update
+availability and emit a business event.
+7. Room & Housekeeping OS
+Checkout
+  
+¯
+Room = Dirty
+  
+¯
+Housekeeping Task
+  
+¯
+Staff Assignment
+  
+¯
+Cleaning Started
+  
+¯
+Cleaning Completed
+  
+¯
+Supervisor Inspection
+  
+¯
+Room = Clean
+  
+¯
+Inventory = Available
+Supported operational states: Available, Reserved, Occupied, Dirty, Cleaning, Inspected, Out of Order, Out of Service,
+Maintenance, Blocked.
+8. Guest CRM / Guest 360
+                    GUEST 360
+                       |
+       +---------------+---------------+
+       |               |               |
+    Identity         Stays          Revenue
+       |               |               |
+ Preferences       Messages        Reviews
+       |               |               |
+       +----------- Behaviour ---------+
+ Unified identity across phone, email, name, booking history and other deterministic identifiers.
+ Stay history, total spend, average stay, last/upcoming stay and booking source.
+ Preferences, VIP status, tags, segments and campaign history.
+ Complaints, reviews, requests and message history.
+9. Communication & Guest Journey Automation
+
+===== PAGE 5 (obj 27) =====
+Hotel Growth OS — Comprehensive Architecture Blueprint
+Page 5
+Trigger
+Automation
+Reservation created
+Confirmation + CRM update + optional upsell
+72 hours before arrival
+Reminder + directions + check-in information + upsells
+Check-in completed
+Welcome message + service-request channel
+Checkout completed
+Thank-you + invoice + review request
+Review received
+Sentiment analysis + positive advocacy or service-recovery workflow
+Dormant guest
+Win-back campaign based on configured segment rules
+10. Event-Driven Architecture
+reservation.created
+reservation.updated
+reservation.cancelled
+guest.created
+guest.updated
+checkin.completed
+checkout.completed
+room.status_changed
+housekeeping.task_created
+housekeeping.task_completed
+payment.received
+payment.failed
+review.received
+lead.created
+lead.updated
+lead.won
+lead.lost
+campaign.sent
+message.received
+maintenance.created
+maintenance.resolved
+Standard event contract:
+{
+  "id": "event_uuid",
+  "type": "reservation.created",
+  "version": 1,
+  "hotel_id": "hotel_uuid",
+  "actor": {"type": "user", "id": "user_uuid"},
+  "timestamp": "...",
+  "data": {},
+  "metadata": {}
+}
+11. n8n Automation Architecture
+Next.js / API
+      
+¯
+Domain Services
+      
+¯
+Supabase
+      
+¯
+Business Events
+      
+¯
+n8n
+      
+¯
+External Services
+n8n should not be the transactional backend. A reservation, check-in or payment record must remain operable if n8n is
+temporarily unavailable. n8n is the orchestration layer for secondary actions, integrations and scheduled automation.
+12. AI Agent Architecture
+                 HOTEL AI ORCHESTRATOR
+
+===== PAGE 6 (obj 28) =====
+Hotel Growth OS — Comprehensive Architecture Blueprint
+Page 6
+                          |
+       +----------+------+------+----------+
+       |          |             |          |
+     Guest       Ops          Revenue    Marketing
+     Agent      Agent          Agent      Agent
+       |          |             |          |
+  Concierge   Housekeeping   Pricing    Campaigns
+  Messaging   Maintenance    Forecast   Reviews
+                 + Sales Agent
+                 + Management Agent
+The AI architecture should begin as read 
+®
+ analyze 
+®
+ recommend, then progress to controlled actions. Autonomous
+mutation of reservations, prices or financial records should require explicit policy and authorization.
+13. AI Gateway
+AI Gateway
+|
++-- Model Router
++-- Prompt Registry
++-- Tool Registry
++-- Context Manager
++-- Token / Cost Tracking
++-- Safety Policies
++-- Logging
++-- Evaluation
+Agents should never receive unrestricted database access. They call controlled domain tools such as get_reservation(),
+search_rooms(), get_guest_profile(), create_housekeeping_task(), draft_message(), send_message(),
+get_daily_metrics() and generate_report().
+14. Agent Responsibilities
+Agent
+Core responsibilities
+Guest Agent
+FAQ, booking assistance, reservation information, hotel facilities, check-in information, service requests, upsells, escalation
+Operations Agent
+Arrivals/departures, room status, housekeeping, maintenance, VIP arrivals, late checkout conflicts, operational exceptions
+Revenue Agent
+Occupancy, ADR, RevPAR, pickup, booking pace, cancellation, lead time, demand and rate recommendations
+Marketing Agent
+Segmentation, campaigns, WhatsApp/email content, win-back, review-response drafts, campaign analytics
+Sales Agent
+Lead qualification, corporate accounts, opportunities, proposals, follow-up and pipeline intelligence
+Management Agent
+Daily executive briefing, anomaly detection, KPI interpretation, prioritized recommendations
+15. AI Governance & Approval Levels
+Level
+Example
+Approval
+L0
+Summarize report
+None
+L1
+Draft message
+None
+L2
+Send guest message
+Configurable
+L3
+Create operational task
+Configurable
+L4
+Modify reservation
+Authorized staff
+L5
+Pricing/financial action
+Explicit authorized approval
+Every AI action should record agent, intent, input, proposed action, risk level, approval, execution result and audit trail.
+
+===== PAGE 7 (obj 29) =====
+Hotel Growth OS — Comprehensive Architecture Blueprint
+Page 7
+16. Analytics & KPI Layer
+KPI
+Formula / meaning
+Occupancy
+Occupied Room Nights ÷ Available Room Nights
+ADR
+Room Revenue ÷ Rooms Sold
+RevPAR
+Room Revenue ÷ Available Room Nights
+Cancellation Rate
+Cancelled bookings ÷ bookings
+Lead Time
+Booking date relative to arrival date
+Average Length of Stay
+Total room nights ÷ stays
+Direct Booking %
+Direct bookings ÷ total bookings
+Repeat Guest Rate
+Returning guests ÷ guests
+The executive dashboard should answer three questions: What happened? Why did it happen? What should we do next?
+17. Reporting Engine
+ReportDefinition
+      
+¯
+Query / Metrics
+      
+¯
+Renderer
+      
+¯
+Dashboard / HTML / PDF / Email
+ Daily hotel report
+ Occupancy and revenue report
+ ADR / RevPAR report
+ Booking-source report
+ Guest report
+ Housekeeping report
+ Payment report
+ Sales pipeline report
+ Marketing performance report
+ Review report
+ Owner executive report
+18. Owner Daily Brief
+OWNER DAILY BRIEF
+Revenue: 
+n
+184,500
+Occupancy: 76%
+ADR: 
+n
+4,320
+RevPAR: 
+n
+3,283
+Compared with previous period:
+Revenue 
+­
+Occupancy 
+¯
+ADR 
+­
+Main issue:
+Weekend pickup is slower than normal.
+
+===== PAGE 8 (obj 30) =====
+Hotel Growth OS — Comprehensive Architecture Blueprint
+Page 8
+Suggested actions:
+1. Review Saturday rate positioning
+2. Activate dormant direct-booking segment
+3. Check OTA availability
+19. Integration Architecture
+Integration Layer
+|
++-- PMS / Channel Manager
++-- Booking Engine / OTA
++-- WhatsApp
++-- Email / SMS
++-- Payment Gateway
++-- POS
++-- Accounting
++-- Google Business
++-- Review Platforms
++-- Analytics
+Use an adapter/connector interface with authenticate(), healthCheck(), pull(), push(), subscribe(), handleWebhook() and
+mapData(). This keeps external providers replaceable.
+20. Webhook Architecture
+Provider
+  
+¯
+Webhook Endpoint
+  
+¯
+Signature Verification
+  
+¯
+Webhook Event Table
+  
+¯
+Deduplication
+  
+¯
+Event Processor
+  
+¯
+Domain Event
+  
+¯
+Automation
+Unverified or duplicated webhooks must never directly mutate critical hotel state.
+21. Frontend & Design System
+Recommended application stack: Next.js + React + TypeScript + Tailwind + shared component system + Supabase.
+app/
+nnn
+ dashboard/
+nnn
+ reservations/
+nnn
+ rooms/
+nnn
+ guests/
+nnn
+ housekeeping/
+nnn
+ billing/
+nnn
+ sales/
+nnn
+ marketing/
+nnn
+ reports/
+nnn
+ ai/
+nnn
+ integrations/
+nnn
+ settings/
+Core UI primitives: DataTable, Calendar, RoomGrid, StatusBadge, MetricCard, Timeline, GuestProfile,
+ReservationDrawer, TaskBoard, CommandPanel, AIInsightCard, ApprovalDialog, ActivityFeed and ReportViewer.
+Design principle: operational clarity over decorative UI. The home dashboard should answer 'what requires attention right
+now?'
+22. Security, Audit & Reliability
+
+===== PAGE 9 (obj 31) =====
+Hotel Growth OS — Comprehensive Architecture Blueprint
+Page 9
+ Supabase Row Level Security for tenant isolation.
+ RBAC plus granular permissions for sensitive operations.
+ Central secrets/credential management; never expose provider secrets in frontend code.
+ Audit every financial, reservation, permission and AI action.
+ Idempotency for mutations and webhook processing.
+ Retries with dead-letter handling for failed integrations.
+ Rate limiting and API validation.
+ Backups, restore procedures and disaster recovery.
+ Health monitoring for application, database, automation and integrations.
+Audit record fields should include user, hotel, action, entity, entity_id, old value, new value, timestamp, source and
+relevant device/IP metadata.
+23. SaaS Commercial Architecture
+Package
+Monthly
+Core scope
+Starter
+n
+5,000
+Front desk, reservations, room matrix, housekeeping, guest CRM, billing, core reports
+Growth
+n
+15,000
+Starter + WhatsApp, automated email, review requests, nightly owner report, revenue/occupancy dashboard
+Managed Growth
+n
+30,000+
+Growth + social content, Google Business management, review responses, monthly performance call
+Established pilot concept: 
+n
+20,000 pilot setup including migration and staff training, anytime cancellation, data export and
+limited pilot slots for feedback/testimonials.
+24. Onboarding & Migration Architecture
+SALE
+ 
+¯
+Payment
+ 
+¯
+Hotel Workspace Created
+ 
+¯
+Onboarding Wizard
+ 
+¯
+Data Migration
+ 
+¯
+Configuration
+ 
+¯
+Integrations
+ 
+¯
+Staff Accounts
+ 
+¯
+Training
+ 
+¯
+QA
+ 
+¯
+Client QA
+ 
+¯
+Go-Live
+ 
+¯
+14-Day Pilot
+ 
+¯
+Success Review
+Onboarding area
+Examples
+Hotel Identity
+Name, logo, branding, contact details
+Property & Rooms
+Room types, rooms, capacity, amenities, status
+
+===== PAGE 10 (obj 32) =====
+Hotel Growth OS — Comprehensive Architecture Blueprint
+Page 10
+Onboarding area
+Examples
+Operations
+Check-in/out, housekeeping, policies, workflows
+Staff & Permissions
+Users, departments, roles
+Financial
+Rates, taxes, payment methods, invoice settings
+Integrations
+WhatsApp, email, payment, website, APIs
+Growth
+Segments, campaigns, reviews, direct booking
+Migration pipeline:
+Upload 
+®
+ Detect Schema 
+®
+ Map Fields 
+®
+ Validate 
+®
+ Preview
+      
+®
+ Resolve Errors 
+®
+ Import 
+®
+ Reconcile 
+®
+ Migration Report
+25. Recommended Repository Architecture
+hotel-growth-os/
+|
++-- apps/
+|   +-- web/
+|   +-- admin/
+|   +-- booking-engine/
+|
++-- packages/
+|   +-- ui/
+|   +-- database/
+|   +-- auth/
+|   +-- domain/
+|   +-- events/
+|   +-- ai/
+|   +-- integrations/
+|   +-- analytics/
+|   +-- reporting/
+|
++-- workflows/
+|   +-- n8n/
+|
++-- agents/
+|   +-- guest/
+|   +-- operations/
+|   +-- revenue/
+|   +-- sales/
+|   +-- marketing/
+|   +-- management/
+|
++-- docs/
+|   +-- architecture/
+|   +-- api/
+|   +-- database/
+|   +-- workflows/
+|   +-- agents/
+|   +-- onboarding/
+|
++-- infrastructure/
+    +-- supabase/
+    +-- vercel/
+    +-- vps/
+26. Deployment Architecture
+                    INTERNET
+                       |
+                    Vercel
+                       |
+                 Next.js Web App
+                       |
+                API / Domain Layer
+                       |
+                  Supabase
+              PostgreSQL + Auth
+              Storage + RLS
+
+===== PAGE 11 (obj 33) =====
+Hotel Growth OS — Comprehensive Architecture Blueprint
+Page 11
+                       |
+                Business Events
+                       |
+                      n8n
+                       |
+       +---------------+---------------+
+       |               |               |
+   WhatsApp          Email           AI APIs
+                       |
+                  External APIs
+The initial infrastructure can use the established stack: Supabase, Vercel, Claude/AI provider, Hostinger VPS and an n8n
+VPS. The architecture should keep each provider replaceable.
+27. Financial Intelligence
+Hotel Growth OS must track two distinct economic domains: the SaaS company's economics and the hotel's operating
+economics.
+SaaS metrics
+Hotel metrics
+MRR / ARR
+Revenue
+CAC
+Occupancy
+Onboarding cost
+ADR
+AI/API cost per hotel
+RevPAR
+Support cost
+Direct booking %
+Gross margin
+Repeat guest rate
+Churn
+Cancellation rate
+LTV
+Revenue per guest
+Payback period
+Ancillary revenue
+Every AI request should be attributable to hotel, agent, workflow, model, token usage, cost, latency and timestamp. This
+allows precise AI cost-per-hotel calculations.
+28. Growth Flywheel
+More Bookings
+     
+­
+Marketing Engine
+     
+­
+Guest Intelligence
+     
+­
+CRM / Data
+     
+­
+Hotel Operations
+     
+­
+PMS / Events
+     
+­
+Better Data
+     
+¯
+AI Intelligence
+     
+¯
+Recommendations
+     
+¯
+Automation
+     
+¯
+Better Operations
+     
+¯
+Better Guest Experience
+     
+¯
+More Revenue
+     
+nnnnnnnnnnnnnnn
+®
+ More Data
+
+===== PAGE 12 (obj 34) =====
+Hotel Growth OS — Comprehensive Architecture Blueprint
+Page 12
+29. Implementation Roadmap
+Phase
+Build
+0 — Revenue Validation
+Sell pilot, validate offer, collect workflows and operational requirements
+1 — Hotel Core
+Auth, multi-tenancy, hotel setup, rooms, reservations, guests, check-in/out, housekeeping, billing, dashboard
+2 — CRM + Communication
+Guest 360, WhatsApp, email, templates, automation, reviews, segmentation
+3 — Growth Intelligence
+Revenue dashboard, occupancy analytics, ADR, RevPAR, channel analytics, owner reports, AI summaries
+4 — AI Agents
+Guest, Operations, Management, Marketing, Sales and Revenue agents
+5 — Integration Platform
+PMS/OTA/channel manager/payment/POS/Google Business/review/accounting connectors
+6 — Autonomous Hotel OS
+Event 
+®
+ AI 
+®
+ recommendation 
+®
+ policy 
+®
+ approval 
+®
+ action 
+®
+ verification 
+®
+ audit
+30. What Not to Build First
+ Full enterprise PMS replacement before validating demand.
+ Dozens of integrations before the first repeatable deployment.
+ Complex machine-learning revenue optimization.
+ Native mobile applications.
+ Custom POS or accounting ERP.
+ Fully autonomous pricing.
+ Autonomous financial actions.
+ Every AI agent simultaneously.
+The architecture should support the end state while implementation remains deliberately narrow. The commercial wedge
+is the fastest route to product-market evidence.
+31. Final Target-State Architecture
+                         HOTEL GROWTH OS
+                              |
+              +---------------+---------------+
+              |                               |
+         EXPERIENCE                        AI LAYER
+              |                               |
+     Staff / Owner / Guest          Guest / Ops / Revenue
+              |                    Marketing / Sales / Mgmt
+              +---------------+---------------+
+                              |
+                       DOMAIN SERVICES
+                              |
+        +----------+----------+----------+----------+
+        |          |          |          |          |
+       PMS        CRM       Rooms     Billing    Growth
+        |          |          |          |          |
+        +----------+----------+----------+----------+
+                              |
+                         EVENT LAYER
+                              |
+                    n8n + Event Processing
+                              |
+                         INTEGRATIONS
+                              |
+        WhatsApp / Email / OTA / Payment / POS / APIs
+                              |
+                         DATA PLATFORM
+                              |
+                PostgreSQL + Storage + Analytics
+
+===== PAGE 13 (obj 35) =====
+Hotel Growth OS — Comprehensive Architecture Blueprint
+Page 13
+                              |
+                      BUSINESS INTELLIGENCE
+                              |
+                  Hotel KPIs + SaaS KPIs
+32. Architectural Principles
+ 
+Supabase = source of truth.
+ Transactional hotel data must have one authoritative home.
+ 
+Domain services = business logic.
+ Keep rules out of UI and automation scripts.
+ 
+Events = nervous system.
+ Business changes emit standardized events.
+ 
+n8n = orchestration.
+ Automation should not be the transactional core.
+ 
+AI Gateway = intelligence boundary.
+ Models, prompts, tools, cost and safety are centrally controlled.
+ 
+Agents = controlled decision systems.
+ Agents act through tools, policies and approvals.
+ 
+Next.js = human operating interface.
+ Optimize for fast hotel staff workflows.
+ 
+Integrations = adapters.
+ External providers must remain replaceable.
+ 
+Analytics = measurement layer.
+ Operational data becomes management intelligence.
+ 
+Build commercially, not ceremonially.
+ Validate the revenue engine before expanding the engineering surface.
+33. Research & Source Note
+This PDF consolidates the Hotel Growth OS architecture recovered from the existing project context and prior
+conversations. The supplied NotebookLM share URL could not be directly extracted in this environment, so its private
+notebook contents are not represented as independently verified source material here. The architecture also reflects
+current hospitality-tech patterns around PMS-centered operations, unified guest identity and connected hotel platforms.
+Next reconciliation step: export the NotebookLM notebook/report/source bundle and provide it here; the document can
+then be updated into a source-audited v2 with a requirements traceability matrix.
