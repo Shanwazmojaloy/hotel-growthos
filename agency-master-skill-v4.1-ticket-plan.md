@@ -14,4 +14,4 @@
 
 ## Release note
 
-`skill.md` is the primary artifact. Install it only after mapping its custom frontmatter fields (`triggers`, `required_mcp`, `default_stack`) to the target host’s loader and configuring the declared MCP servers. The current workspace did not register slash commands or connect those servers.
+`skill.md` is the primary artifact. Install it only after mapping its custom frontmatter fields (`triggers`, `required_mcp`, `default_stack`) to the target host's loader and configuring the declared MCP servers. The current workspace did not register slash commands or connect those servers.
