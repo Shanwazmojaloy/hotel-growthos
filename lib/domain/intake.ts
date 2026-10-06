@@ -39,19 +39,59 @@ function hasControlCharacters(value: string): boolean {
   return CONTROL_CHARACTERS.test(value);
 }
 
+function isPrivateOrLocalHostname(hostname: string): boolean {
+  const normalized = hostname.toLowerCase();
+
+  if (
+    normalized === "localhost" ||
+    normalized.endsWith(".localhost") ||
+    normalized === "127.0.0.1" ||
+    normalized === "0.0.0.0" ||
+    normalized === "::1" ||
+    normalized === "[::1]" ||
+    normalized === "[::]" ||
+    normalized.endsWith(".local") ||
+    normalized.endsWith(".internal")
+  ) {
+    return true;
+  }
+
+  if (/^\d+\.\d+\.\d+\.\d+$/u.test(normalized)) {
+    const octets = normalized.split(".").map((part) => Number.parseInt(part, 10));
+    if (octets.length !== 4 || octets.some((octet) => !Number.isInteger(octet))) {
+      return false;
+    }
+
+    return (
+      octets[0] === 10 ||
+      (octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31) ||
+      (octets[0] === 192 && octets[1] === 168) ||
+      (octets[0] === 169 && octets[1] === 254) ||
+      (octets[0] === 127)
+    );
+  }
+
+  return false;
+}
+
 function normalizeWebsite(value: string): string | null {
-  if (!value) return null;
-  if (value.length > INTAKE_LIMITS.hotelWebsite || hasControlCharacters(value)) {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  if (trimmed.length > INTAKE_LIMITS.hotelWebsite || hasControlCharacters(trimmed)) {
     return null;
   }
 
   try {
-    const url = new URL(value);
+    const url = new URL(trimmed);
+    const protocol = url.protocol.toLowerCase();
+    const hostname = url.hostname;
+
     if (
-      (url.protocol !== "http:" && url.protocol !== "https:") ||
-      !url.hostname ||
+      (protocol !== "http:" && protocol !== "https:") ||
+      !hostname ||
       url.username ||
-      url.password
+      url.password ||
+      isPrivateOrLocalHostname(hostname)
     ) {
       return null;
     }
