@@ -117,13 +117,15 @@ Vercel reports a failed deployment on the project's **Deployments** page. The wa
 ```bash
 npm run lint       # ESLint check
 npm run typecheck  # Strict TypeScript check
-npm run test       # Vitest suite (48 tests covering domain, tokens, replay, file & Supabase stores)
+npm run test       # Vitest suite (54 tests: domain, tokens, replay, file & Supabase stores, deploy config)
 npm run build      # Next.js production build (Turbopack)
 npm run verify     # All of the above, in order (used by CI)
 npm audit --omit=dev # Production dependency audit (0 vulnerabilities)
 ```
 
 `.github/workflows/ci.yml` runs `npm ci --include=dev`, `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build` on Node 22.x for every push and pull request, so a clean-environment build is verified before Vercel builds it again.
+
+`tests/deploy-config.test.ts` guards the deployment contract itself, since a mistake there fails a *deployment* rather than a test run. It asserts that `vercel.json` keeps the Next.js preset, `npm run build`, `.next` as the output directory, and `npm install --include=dev` as the install command; that `$schema` stays a resolvable plain URL (copying the file out of a rendered Markdown page yields `[https://…](https://…)`); that `microfrontends.json` names the project in `package.json` as the default application; that `engines.node` and `.nvmrc` agree on the same major; and that CI still installs devDependencies and runs the same lint/typecheck/test/build steps.
 
 ## Stack
 
