@@ -28,7 +28,7 @@ describe("validateIntakeSubmission", () => {
     const result = validateIntakeSubmission(validSubmission());
 
     expect(result.ok).toBe(true);
-    if (!result.ok) return;
+    if (result.ok !== true) return;
     expect(result.data).toEqual({
       fullName: "Alex Morgan",
       email: "alex@example.com",
@@ -50,8 +50,7 @@ describe("validateIntakeSubmission", () => {
   ])("requires a valid %s", (field, value) => {
     const result = validateIntakeSubmission(validSubmission({ [field]: value }));
     expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.errors).toHaveProperty(field);
+    if (result.ok === false) expect(result.errors).toHaveProperty(field);
   });
 
   it("requires explicit permission to reply to the request", () => {
@@ -60,7 +59,7 @@ describe("validateIntakeSubmission", () => {
     );
 
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.errors.contactPermission).toBeDefined();
+    if (result.ok === false) expect(result.errors.contactPermission).toBeDefined();
   });
 
   it.each(["<script>", "javascript:alert(1)", "ftp://northstar.example"]) (
@@ -68,7 +67,7 @@ describe("validateIntakeSubmission", () => {
     (hotelWebsite) => {
       const result = validateIntakeSubmission(validSubmission({ hotelWebsite }));
       expect(result.ok).toBe(false);
-      if (!result.ok) expect(result.errors.hotelWebsite).toBeDefined();
+      if (result.ok === false) expect(result.errors.hotelWebsite).toBeDefined();
     },
   );
 
@@ -78,7 +77,7 @@ describe("validateIntakeSubmission", () => {
     );
 
     expect(result.ok).toBe(true);
-    if (result.ok) {
+    if (result.ok === true) {
       expect(result.data.hotelWebsite).toBeNull();
       expect(result.data.role).toBeNull();
     }
@@ -94,7 +93,7 @@ describe("validateIntakeSubmission", () => {
   ])("rejects overlong %s input", (field, value) => {
     const result = validateIntakeSubmission(validSubmission({ [field]: value }));
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.errors).toHaveProperty(field);
+    if (result.ok === false) expect(result.errors).toHaveProperty(field);
   });
 
   it("rejects non-object payloads and non-string form fields", () => {
@@ -110,7 +109,7 @@ describe("validateIntakeSubmission", () => {
     (field) => {
       const result = validateIntakeSubmission(validSubmission({ [field]: { value: "not-a-string" } }));
       expect(result.ok).toBe(false);
-      if (!result.ok) expect(result.errors).toHaveProperty(field);
+      if (result.ok === false) expect(result.errors).toHaveProperty(field);
     },
   );
 });
