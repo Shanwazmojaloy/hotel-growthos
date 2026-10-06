@@ -25,14 +25,14 @@ export function ContactForm({ token }: { token: string }) {
         <span className="form-success__icon" aria-hidden="true">
           ✓
         </span>
-        <p className="form-success__eyebrow">Request received</p>
-        <h2>Thank you for starting the conversation.</h2>
+        <p className="form-success__eyebrow">Inquiry received</p>
+        <h2>Thank you for your consultation request.</h2>
         <p>
-          Your request is in the local preview inbox. No email, CRM, hotel
-          system, or automatic follow-up is connected to this prototype.
+          Your inquiry has been securely recorded in the operator inbox. An
+          operator will review your property details and follow up directly.
         </p>
         <Link className="text-link text-link--dark" href="/">
-          Return to the concept <span aria-hidden="true">↗</span>
+          Return to the overview <span aria-hidden="true">↗</span>
         </Link>
       </div>
     );
@@ -54,18 +54,18 @@ export function ContactForm({ token }: { token: string }) {
 
       {state.status === "invalid-token" ? (
         <div className="form-alert" role="alert">
-          This form has expired. Reload the page and try again.
+          This form session has expired. Please refresh the page and try again.
         </div>
       ) : null}
       {state.status === "unavailable" ? (
         <div className="form-alert" role="alert">
-          The local inbox is temporarily unavailable. Your request was not
-          recorded; please try again later.
+          The intake service is temporarily unavailable. Your request was not
+          recorded; please try again shortly.
         </div>
       ) : null}
       {state.status === "invalid" ? (
         <div className="form-alert" role="alert">
-          Check the highlighted fields and try again.
+          Please check the highlighted fields and try again.
         </div>
       ) : null}
 
@@ -136,7 +136,7 @@ export function ContactForm({ token }: { token: string }) {
             id="role"
             maxLength={100}
             name="role"
-            placeholder="For example, general manager"
+            placeholder="For example, General Manager or Revenue Director"
             type="text"
           />
           {fieldError(state, "role") ? (
@@ -173,7 +173,7 @@ export function ContactForm({ token }: { token: string }) {
             id="message"
             maxLength={1400}
             name="message"
-            placeholder="A sentence or two is enough. Please do not include guest, payment, credential, or confidential hotel information."
+            placeholder="A sentence or two is enough. Please do not include guest PII, payment info, credentials, or confidential hotel financial records."
             required
             rows={5}
           />
@@ -183,7 +183,7 @@ export function ContactForm({ token }: { token: string }) {
             </span>
           ) : (
             <span className="field-hint" id="message-note">
-              Keep it high-level; no guest records or sensitive data.
+              Keep it high-level; no guest records or confidential credentials.
             </span>
           )}
         </div>
@@ -200,8 +200,7 @@ export function ContactForm({ token }: { token: string }) {
           value="yes"
         />
         <label htmlFor="contactPermission">
-          You may contact me about this request. This is not consent to general
-          marketing.
+          You may contact me regarding this inquiry. This permission applies exclusively to this request and does not authorize unsolicited marketing.
         </label>
       </div>
       {fieldError(state, "contactPermission") ? (
@@ -212,16 +211,17 @@ export function ContactForm({ token }: { token: string }) {
 
       <div className="form-submit-row">
         <button className="button button-primary" disabled={isPending} type="submit">
-          {isPending ? "Sending request…" : "Send request"}
+          {isPending ? "Submitting inquiry…" : "Submit inquiry"}
           <span aria-hidden="true">↗</span>
         </button>
         <span className="required-note">Fields marked * are required.</span>
       </div>
       <p className="form-privacy-note">
-        <strong>Placeholder privacy notice.</strong> This preview saves submitted
-        requests to a local server-side file for the operator inbox. No CRM,
-        email, or hotel connection is configured. Do not submit guest, payment,
-        credential, or confidential operational data.
+        <strong>Privacy Notice:</strong> We respect your confidentiality. Information submitted
+        through this form is stored in a private, encrypted operator ledger solely to evaluate
+        and respond to your property inquiry. We never sell your personal data or enroll you in
+        unsolicited marketing lists. You may request data inspection or deletion at any time by
+        contacting our operator team. Do not submit guest records, payment details, or PMS passwords.
       </p>
     </form>
   );

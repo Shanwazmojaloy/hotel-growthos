@@ -1,8 +1,10 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
 import { join } from "node:path";
+import type { LeadStore } from "../domain/lead-ledger";
 import { hasStrongSigningSecret } from "../domain/signed-token";
 import { FileLeadStore } from "./file-lead-store";
+import { SupabaseLeadStore } from "./supabase-lead-store";
 
 const developmentGlobal = globalThis as typeof globalThis & {
   __hgoDevelopmentSigningSecret?: string;
@@ -30,9 +32,23 @@ export function getOperatorConfig(): { secret: string; password: string } | null
   return { secret, password };
 }
 
-export function createDefaultLeadStore(): FileLeadStore {
+export function createDefaultLeadStore(): LeadStore {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_ANON_KEY;
+
+  if (supabaseUrl && supabaseKey) {
+    return new SupabaseLeadStore({
+      url: supabaseUrl,
+      apiKey: supabaseKey,
+    });
+  }
+
   return new FileLeadStore({
     filePath:
-      process.env.HGO_LEDGER_PATH ?? join(process.cwd(), ".local", "lead-ledger.json"),
+      process.env.HGO_LEDGER_PATH ??
+      (process.env.VERCEL
+        ? join("/tmp", "lead-ledger.json")
+        : join(process.cwd(), ".local", "lead-ledger.json")),
   });
 }

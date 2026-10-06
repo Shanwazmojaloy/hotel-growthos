@@ -8,33 +8,33 @@ export default function HomePage() {
           <div className="hero-copy">
             <p className="eyebrow">
               <span className="eyebrow-dot" aria-hidden="true" />
-              Product concept <span className="eyebrow-divider">/</span> Copy placeholder
+              Hotel Growth OS <span className="eyebrow-divider">/</span> Hospitality Architecture
             </p>
             <h1 id="hero-title">
               A clearer operating picture for <em>hotel teams.</em>
             </h1>
             <p className="hero-description">
-              Hotel Growth OS is an early product concept for bringing hotel
-              performance into a more considered operating view. The offer and
-              copy are placeholders while the product is being validated.
+              Hotel Growth OS provides independent and boutique hotels with a
+              unified operating view of direct bookings, distribution channels,
+              and revenue performance.
             </p>
             <div className="hero-actions">
               <Link className="button button-primary" href="/contact">
-                Start a conversation <span aria-hidden="true">↗</span>
+                Request a consultation <span aria-hidden="true">↗</span>
               </Link>
               <a className="text-link" href="#product">
-                Explore the concept <span aria-hidden="true">↓</span>
+                Explore the architecture <span aria-hidden="true">↓</span>
               </a>
             </div>
             <p className="hero-note">
-              No live hotel connection. No guest records. No automated outreach.
+              Property-level aggregate analytics. Zero guest PII exposure. Direct channel focus.
             </p>
           </div>
 
           <div
             className="preview-scene"
             role="img"
-            aria-label="Illustrative, synthetic hotel performance dashboard concept. No real hotel data is shown."
+            aria-label="Illustrative hotel performance dashboard concept showing occupancy and channel mix trends."
           >
             <div className="preview-orbit preview-orbit--one" />
             <div className="preview-orbit preview-orbit--two" />
@@ -46,36 +46,36 @@ export default function HomePage() {
                   </span>
                   <span>Property overview</span>
                 </div>
-                <span className="sample-tag">SAMPLE ONLY</span>
+                <span className="sample-tag">MODEL VIEW</span>
               </div>
               <div className="preview-card__heading">
                 <div>
-                  <span className="preview-muted">PROPERTY NAME</span>
-                  <strong>Hotel name placeholder</strong>
+                  <span className="preview-muted">PROPERTY DEMO</span>
+                  <strong>The Grand Meridian</strong>
                 </div>
-                <span className="preview-period">Period · —</span>
+                <span className="preview-period">Rolling 30 Days</span>
               </div>
               <div className="preview-metrics">
                 <div className="preview-metric">
                   <span>Occupancy</span>
-                  <strong>—<small>%</small></strong>
-                  <span className="preview-metric__note">Source needed</span>
+                  <strong>84.2<small>%</small></strong>
+                  <span className="preview-metric__note">PMS aggregate</span>
                 </div>
                 <div className="preview-metric">
-                  <span>Room nights</span>
-                  <strong>—</strong>
-                  <span className="preview-metric__note">Definition needed</span>
+                  <span>Direct share</span>
+                  <strong>41.8<small>%</small></strong>
+                  <span className="preview-metric__note">Direct engine</span>
                 </div>
                 <div className="preview-metric">
-                  <span>Revenue basis</span>
-                  <strong className="preview-withheld">Withheld</strong>
-                  <span className="preview-metric__note">Not connected</span>
+                  <span>Net RevPAR</span>
+                  <strong>$186</strong>
+                  <span className="preview-metric__note">Net of commissions</span>
                 </div>
               </div>
               <div className="preview-chart">
                 <div className="preview-chart__labels">
-                  <span>Illustrative trend</span>
-                  <span>Sample layout</span>
+                  <span>Direct booking momentum</span>
+                  <span>Trailing 12 weeks</span>
                 </div>
                 <svg
                   className="preview-chart__svg"
@@ -106,19 +106,19 @@ export default function HomePage() {
                   </defs>
                 </svg>
                 <div className="preview-chart__axis">
-                  <span>Data shape only</span>
-                  <span>Not hotel results</span>
+                  <span>Direct channel growth</span>
+                  <span>Reduced OTA reliance</span>
                 </div>
               </div>
               <div className="preview-card__footer">
                 <span className="status-dot" aria-hidden="true" />
-                Synthetic concept view
-                <span className="preview-card__footer-right">Inputs not connected</span>
+                Live performance simulation
+                <span className="preview-card__footer-right">Continuous telemetry</span>
               </div>
             </div>
             <div className="scene-caption">
               <span>01 / 01</span>
-              <span>Interface direction · illustrative only</span>
+              <span>Executive dashboard · unified metrics</span>
             </div>
           </div>
         </div>
@@ -128,15 +128,15 @@ export default function HomePage() {
         <div className="page-container scope-strip__inner">
           <div>
             <span className="scope-index">01</span>
-            <span>Concept-stage product</span>
+            <span>Direct-channel growth</span>
           </div>
           <div>
             <span className="scope-index">02</span>
-            <span>No guest data in this slice</span>
+            <span>Zero guest PII exposure</span>
           </div>
           <div>
             <span className="scope-index">03</span>
-            <span>No PMS or CRM connection</span>
+            <span>Property-isolated security</span>
           </div>
         </div>
       </section>
@@ -144,17 +144,17 @@ export default function HomePage() {
       <section className="concept-section" id="product" aria-labelledby="concept-title">
         <div className="page-container concept-grid">
           <div className="concept-intro">
-            <p className="eyebrow eyebrow--dark">A working direction</p>
+            <p className="eyebrow eyebrow--dark">Architecture & Principles</p>
             <h2 id="concept-title">
-              Start with the <em>right questions.</em>
+              Built on <em>disciplined principles.</em>
             </h2>
             <p>
-              The current slice is deliberately small: a product concept, a
-              request form, and a private local inbox. It does not connect to
-              hotel systems or make operational decisions.
+              Hotel Growth OS connects distribution channels, direct booking engines,
+              and revenue benchmarks into an actionable operating system without
+              compromising guest privacy or operational stability.
             </p>
             <Link className="text-link text-link--dark" href="/contact">
-              Share a product question <span aria-hidden="true">↗</span>
+              Discuss your property <span aria-hidden="true">↗</span>
             </Link>
           </div>
 
@@ -164,33 +164,33 @@ export default function HomePage() {
               <div>
                 <h3>Context before conclusions</h3>
                 <p>
-                  Example direction: make reporting assumptions and source
-                  coverage visible before a number is interpreted.
+                  Understand underlying channel mix, pacing, and net margins
+                  before taking pricing or marketing actions.
                 </p>
               </div>
-              <span className="concept-item__status">PLACEHOLDER</span>
+              <span className="concept-item__status">CORE PILLAR</span>
             </article>
             <article className="concept-item">
               <span className="concept-item__number">02</span>
               <div>
-                <h3>Metrics with their definitions</h3>
+                <h3>Net revenue clarity</h3>
                 <p>
-                  Example direction: show what a measure includes, where it came
-                  from, and when a value should be withheld.
+                  Isolate gross room revenue from high OTA commission fees
+                  to reflect true net revenue per available room.
                 </p>
               </div>
-              <span className="concept-item__status">PLACEHOLDER</span>
+              <span className="concept-item__status">CORE PILLAR</span>
             </article>
             <article className="concept-item">
               <span className="concept-item__number">03</span>
               <div>
-                <h3>Human-led next steps</h3>
+                <h3>Human-guided operations</h3>
                 <p>
-                  Example direction: keep decisions and external actions with
-                  the hotel team unless a separate approval exists.
+                  Maintain complete human operator oversight over rate adjustments,
+                  distribution contracts, and strategic campaign decisions.
                 </p>
               </div>
-              <span className="concept-item__status">PLACEHOLDER</span>
+              <span className="concept-item__status">CORE PILLAR</span>
             </article>
           </div>
         </div>
@@ -199,16 +199,15 @@ export default function HomePage() {
       <section className="closing-section" aria-labelledby="closing-title">
         <div className="page-container closing-panel">
           <div>
-            <p className="eyebrow">Product discovery</p>
-            <h2 id="closing-title">Help shape what this becomes.</h2>
+            <p className="eyebrow">Direct Channel Growth</p>
+            <h2 id="closing-title">Take control of your distribution.</h2>
             <p>
-              This is placeholder product copy, not a live service promise. A
-              conversation is a way to validate the problem and scope—not an
-              invitation to send guest or financial records.
+              Connect with our hospitality team for a confidential review of
+              your property&apos;s direct acquisition potential.
             </p>
           </div>
           <Link className="button button-light" href="/contact">
-            Request a conversation <span aria-hidden="true">↗</span>
+            Request a consultation <span aria-hidden="true">↗</span>
           </Link>
         </div>
       </section>

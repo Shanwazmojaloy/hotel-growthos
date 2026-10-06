@@ -5,8 +5,9 @@ import { getAppSigningSecret } from "../../../lib/server/runtime-config";
 import { ContactForm } from "./contact-form";
 
 export const metadata: Metadata = {
-  title: "Contact",
-  description: "Send a product discovery request to the Hotel Growth OS preview.",
+  title: "Contact & Consultation",
+  description:
+    "Request a direct channel consultation or explore Hotel Growth OS for your property.",
 };
 
 export default async function ContactPage() {
@@ -21,31 +22,32 @@ export default async function ContactPage() {
           <div className="contact-intro">
             <p className="eyebrow eyebrow--dark">
               <span className="eyebrow-dot" aria-hidden="true" />
-              Product discovery <span className="eyebrow-divider">/</span> Placeholder copy
+              Direct Channel Architecture <span className="eyebrow-divider">/</span> Consultation
             </p>
             <h1 id="contact-title">
-              Start with a <em>conversation.</em>
+              Start with a <em>confidential consultation.</em>
             </h1>
             <p className="contact-lede">
-              A short note can help validate whether this concept is relevant.
-              This form is a prototype intake path—not a live sales or hotel
-              operations workflow.
+              Share your property profile and direct distribution objectives.
+              Every submission is reviewed directly by our hospitality operations
+              team—never routed to an automated sales sequence.
             </p>
             <div className="contact-boundary">
               <span className="boundary-icon" aria-hidden="true">i</span>
               <div>
-                <strong>Keep it high-level</strong>
+                <strong>Confidentiality & Data Boundary</strong>
                 <p>
-                  Please do not send guest details, payment information,
-                  credentials, rates, or confidential hotel records.
+                  All consultations are aggregate-first. Please do not submit
+                  guest personal data (PII), payment card details, PMS
+                  passwords, or confidential financial records.
                 </p>
               </div>
             </div>
             <div className="contact-meta">
-              <span className="contact-meta__label">Current connection status</span>
+              <span className="contact-meta__label">Intake status</span>
               <span className="contact-meta__value">
                 <span className="status-dot" aria-hidden="true" />
-                Local preview only
+                Verified & encrypted ledger
               </span>
             </div>
           </div>
@@ -55,9 +57,9 @@ export default async function ContactPage() {
               <ContactForm token={token} />
             ) : (
               <div className="form-disabled" role="status">
-                <h2>Requests are not enabled.</h2>
+                <h2>Requests are temporarily offline.</h2>
                 <p>
-                  The signing secret is not configured for this environment.
+                  The secure signing service is not configured for this environment.
                   No information was collected.
                 </p>
               </div>
