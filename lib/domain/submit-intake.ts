@@ -37,7 +37,9 @@ export async function processIntakeSubmission({
   }
 
   const validation = validateIntakeSubmission(fields);
-  if (!validation.ok) return { status: "invalid", errors: validation.errors };
+  if (validation.ok === false) {
+    return { status: "invalid", errors: validation.errors };
+  }
 
   try {
     const persisted = await store.createOrGetLead({

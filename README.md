@@ -7,6 +7,7 @@ The architecture enforces strict data boundaries: aggregate-first property analy
 ## Included Slice
 
 - `/` — public product overview outlining direct-channel growth, net revenue clarity, and human-guided operations.
+- `/hotelgrowthOS` — permanent compatibility redirect to `/` for the existing project URL.
 - `/contact` — server-validated consultation intake form with an expiring HMAC-signed form token, explicit permission-to-reply consent, field boundaries/normalization, and an anti-spam honeypot.
 - `/ops` — single-operator sign-in using server-configured password authentication and signed session cookies (`HttpOnly`, `SameSite=Lax`, `Secure` in production).
 - `/ops/leads` — authenticated, read-only consultation inbox. Every request is verified server-side.
