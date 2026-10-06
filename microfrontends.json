@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/microfrontends.json",
+  "applications": {
+    "hotel-growthos": {
+      "development": {
+        "fallback": "https://hotel-growthos.vercel.app"
+      }
+    }
+  }
+}
