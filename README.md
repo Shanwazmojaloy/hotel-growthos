@@ -42,7 +42,7 @@ Do **not** set `NODE_ENV` or `NPM_CONFIG_PRODUCTION` / `NPM_CONFIG_OMIT` as proj
 
 ## Running Locally
 
-Node.js **22.x** is the supported runtime (pinned in `package.json` under `engines.node` and in `.nvmrc`).
+Node.js **24.x** is the supported runtime (pinned in `package.json` under `engines.node` and in `.nvmrc`).
 
 ```bash
 npm ci
@@ -61,7 +61,7 @@ npm run dev
 
 1. **Framework & Output (pinned in `vercel.json`):** This repo ships a `vercel.json` that forces the **Next.js** framework preset, runs `npm run build`, pins `installCommand` to `npm install --include=dev`, and uses `.next` as the output directory. These file settings take precedence over Project Settings, which fixes the `No Output Directory named "public" found` failure that occurs when a project is detected as a static ("Other") site.
 2. **Dashboard checklist (Settings > General > Build and Development Settings):** Framework Preset should be **Next.js**, Root Directory should be `./` (repo root), and Build Command / Output Directory / Install Command should be left at their defaults (or match `vercel.json`). If `public` was ever typed into Output Directory manually, clear it back to the default.
-3. **Node.js Version:** `engines.node` is pinned to `22.x`. Set **Settings > General > Node.js Version** to **22.x** as well so the dashboard and the manifest agree, and so a future Node.js major cannot silently change the build runtime. The previous open-ended `">=20.9.0"` range produced the `Detected "engines": { "node": ">=20.9.0" } ... that will automatically upgrade when a new major Node.js Version is released` warning on every build.
+3. **Node.js Version:** `engines.node` is pinned to `24.x`. Set **Settings > General > Node.js Version** to **24.x** as well so the dashboard and the manifest agree, and so a future Node.js major cannot silently change the build runtime. When the two disagree, Vercel keeps the build on `engines.node` and prints `Due to "engines": { "node": "24.x" } in your package.json file, the Node.js Version defined in your Project Settings (...) will not apply` on every build — harmless, but it means the dashboard setting is being ignored. The earlier open-ended `">=20.9.0"` range produced a different `... will automatically upgrade when a new major Node.js Version is released` warning, which is why the range was replaced with an explicit major.
 4. **Install-script approvals:** Newer npm releases block dependency lifecycle scripts unless they are listed in `package.json` under `allowScripts`, which produces the `1 package has install scripts not yet covered by allowScripts` warning. `unrs-resolver@1.11.1` (used by ESLint's TypeScript import resolver) is approved in this repo. Review the current state with `npm install-scripts ls` and approve deliberately with `npm install-scripts approve <pkg>` — never `--all`.
 5. **Environment Variables:** In the Vercel Dashboard under **Settings > Environment Variables**, ensure `HGO_APP_SECRET` and `OPS_PASSWORD` are configured.
 6. **Database Migration:** If using Supabase (`https://gvjxjsjwuweecilcqqhb.supabase.co`), run `supabase/migrations/20261005000000_leads_schema.sql` in the Supabase SQL editor and supply `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to Vercel.
@@ -123,7 +123,7 @@ npm run verify     # All of the above, in order (used by CI)
 npm audit --omit=dev # Production dependency audit (0 vulnerabilities)
 ```
 
-`.github/workflows/ci.yml` runs `npm ci --include=dev`, `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build` on Node 22.x for every push and pull request, so a clean-environment build is verified before Vercel builds it again.
+`.github/workflows/ci.yml` runs `npm ci --include=dev`, `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build` on Node 24.x for every push and pull request, so a clean-environment build is verified before Vercel builds it again.
 
 `tests/deploy-config.test.ts` guards the deployment contract itself, since a mistake there fails a *deployment* rather than a test run. It asserts that `vercel.json` keeps the Next.js preset, `npm run build`, `.next` as the output directory, and `npm install --include=dev` as the install command; that it contains **no** top-level key beyond those five (the published schema sets `additionalProperties: false`, so a stray key is rejected at deploy time with an opaque "invalid vercel.json"); that `$schema` stays a resolvable plain URL in both `vercel.json` and `microfrontends.json` (copying a file out of a rendered Markdown page yields `[https://…](https://…)`); that `next.config.ts` still wraps the config in `withMicrofrontends`, without which `microfrontends.json` never reaches the build output and the blocking `mfe-config-present` check fails; that `microfrontends.json` names the project in `package.json` as the default application; that `engines.node` and `.nvmrc` agree on the same major and CI resolves its Node.js version from `.nvmrc`; that CI still installs devDependencies and runs the same lint/typecheck/test/build steps; and that the **Production Deployment on Vercel** section documents the same build command, install command, and output directory that `vercel.json` pins.
 
@@ -134,4 +134,4 @@ npm audit --omit=dev # Production dependency audit (0 vulnerabilities)
 - **Language:** TypeScript 5 (strict mode)
 - **Styling:** Tailwind CSS v4 with system font stack (no Google Fonts egress)
 - **Testing:** Vitest 5.0.3
-- **Runtime:** Node.js 22.x
+- **Runtime:** Node.js 24.x

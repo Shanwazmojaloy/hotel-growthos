@@ -87,7 +87,7 @@ describe("Vercel deployment configuration", () => {
     const engines = packageJson.engines as { node?: string };
 
     expect(engines.node).toBe(`${nvmrc}.x`);
-    expect(nvmrc).toBe("22");
+    expect(nvmrc).toBe("24");
   });
 
   it("keeps the CI workflow's install and verify steps aligned with the Vercel build", async () => {
@@ -114,8 +114,8 @@ describe("Vercel deployment configuration", () => {
       "utf8",
     );
 
-    // A hardcoded `node-version: 22` in CI drifts from `.nvmrc`/`engines.node` when
-    // only one of them is bumped. Reading the file keeps all three on one source.
+    // A hardcoded `node-version:` major in CI drifts from `.nvmrc`/`engines.node`
+    // when only one of them is bumped. Reading the file keeps all three on one source.
     expect(workflow).toContain("node-version-file: .nvmrc");
   });
 
