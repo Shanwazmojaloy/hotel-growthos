@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Ignore leftover boilerplate / generated directories:
+    "my-app/**",
+    "**/node_modules/**",
   ]),
 ]);
 
