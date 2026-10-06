@@ -3,14 +3,14 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Hotel Growth OS — concept preview",
+    default: "Hotel Growth OS — Direct Channel & Hospitality Architecture",
     template: "%s · Hotel Growth OS",
   },
   description:
-    "An early product concept for a clearer operating view of hotel performance. Placeholder copy; no live hotel systems are connected.",
+    "A unified operating system for independent and boutique hotels. Elevating direct bookings, channel distribution, and net revenue clarity.",
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
   },
 };
 

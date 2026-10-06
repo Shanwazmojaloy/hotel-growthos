@@ -19,7 +19,7 @@ export default function PublicLayout({
             </span>
           </Link>
           <nav className="site-nav" aria-label="Main navigation">
-            <Link href="/#product">The concept</Link>
+            <Link href="/#product">Architecture</Link>
             <Link href="/contact">Contact</Link>
             <Link className="nav-operator" href="/ops">
               Operator sign in <span aria-hidden="true">↗</span>
@@ -33,8 +33,8 @@ export default function PublicLayout({
           <Link className="footer-brand" href="/">
             Hotel Growth OS
           </Link>
-          <p>Concept preview · Placeholder copy · No live hotel systems connected</p>
-          <span>Hotel Growth OS · Concept preview</span>
+          <p>Hotel Growth OS · Direct Channel Operating Architecture · Confidential & Property-Isolated</p>
+          <span>Direct Channel & Growth Architecture</span>
         </div>
       </footer>
     </>
