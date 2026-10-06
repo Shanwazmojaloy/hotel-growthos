@@ -55,10 +55,12 @@ npm run dev
 
 ## Production Deployment on Vercel
 
-1. **Node.js Engine:** The project targets Next.js 16.3.8 and requires Node.js >= 20.9.0. This is declared in `package.json` under `engines.node`.
-2. **Environment Variables:** In the Vercel Dashboard under **Settings > Environment Variables**, ensure `HGO_APP_SECRET` and `OPS_PASSWORD` are configured.
-3. **Database Migration:** If using Supabase (`https://gvjxjsjwuweecilcqqhb.supabase.co`), run `supabase/migrations/20261005000000_leads_schema.sql` in the Supabase SQL editor and supply `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to Vercel.
-4. **Vercel CLI Inspection:** To link or inspect remote deployment logs locally:
+1. **Framework & Output (pinned in `vercel.json`):** This repo ships a `vercel.json` that forces the **Next.js** framework preset, runs `npm run build`, and uses `.next` as the output directory. These file settings take precedence over Project Settings, which fixes the `No Output Directory named "public" found` failure that occurs when a project is detected as a static ("Other") site.
+2. **Dashboard checklist (Settings > General > Build and Development Settings):** Framework Preset should be **Next.js**, Root Directory should be `./` (repo root), and Build Command / Output Directory / Install Command should be left at their defaults (or match `vercel.json`). If `public` was ever typed into Output Directory manually, clear it back to the default.
+3. **Node.js Engine:** The project targets Next.js 16.3.8 and requires Node.js >= 20.9.0. This is declared in `package.json` under `engines.node`.
+4. **Environment Variables:** In the Vercel Dashboard under **Settings > Environment Variables**, ensure `HGO_APP_SECRET` and `OPS_PASSWORD` are configured.
+5. **Database Migration:** If using Supabase (`https://gvjxjsjwuweecilcqqhb.supabase.co`), run `supabase/migrations/20261005000000_leads_schema.sql` in the Supabase SQL editor and supply `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to Vercel.
+6. **Vercel CLI Inspection:** To link or inspect remote deployment logs locally:
    ```bash
    npx vercel link
    npx vercel inspect <deployment-id> --logs
