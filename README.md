@@ -91,6 +91,23 @@ Vercel reports a failed deployment on the project's **Deployments** page. The wa
    - **Install skipped dev dependencies:** see the `NODE_ENV` / `NPM_CONFIG_PRODUCTION` note above.
    - **Environment variables:** `HGO_APP_SECRET` must be at least 32 bytes and `OPS_PASSWORD` at least 16 characters, otherwise the operator routes refuse to start (`/ops` shows the configuration notice instead of the sign-in form).
 4. If a build fails with **no build logs at all**, Vercel prevented the build from starting — an invalid `vercel.json`, an ignored build step, or a commit author without access to the project's Git connection.
+5. If the commit status says **`Checks for Deployment have failed`** while the build itself was green, the build was *staged* and never released to production. Vercel holds every production deployment until all required **Deployment Checks** pass before assigning it to the production domains, so this status means a check — not the build — is the blocker. Open **Settings > Build and Deployment > Deployment Checks** (or the failed deployment's **Checks** panel) and inspect each entry:
+   - **Lint / Typecheck** — native script checks. They run the matching `package.json` scripts (both exist in this repo), so they should pass whenever CI passes. Their logs stream from the deployment detail view.
+   - **Microfrontends Config Present** (`mfe-config-present`) — verifies that `microfrontends.json` is present in the build outputs. It is blocking by default **only for a project that is the *default application* of a Vercel Microfrontends group**, and it applies to production deployments only. This repository is a single Next.js app with no `microfrontends.json` and no need for one, so if that check appears against this project it has been enrolled in a Microfrontends group by mistake. Fix it in **Settings > Microfrontends**: use **Remove from Group**, or delete the group:
+     ```bash
+     npx vercel microfrontends inspect-group   # confirm whether the project is in a group
+     npx vercel microfrontends delete-group    # only if the group is unintended (irreversible)
+     ```
+     A project that is the group's *default application* cannot be removed with `remove-from-group` — use the dashboard. Once removed, the tab reads "This project is not a microfrontend" and the change takes effect on the next deployment.
+   - Each check's target environments are configurable in the checks list (production only, or production and preview). A check that must not gate releases should be removed or rescoped there, not worked around in application code.
+
+   Note: the sentence *"The mfe-config-present check only applies to production deployments of a microfrontends default app"* is an applicability note attached to that check, not a build error. Look for the red `Error` line under the **Building** accordion for an actual build failure.
+6. If the commit status says **`GitHub couldn't verify an account for the commit`** (or the deployment is marked *Blocked* with no build logs), Vercel could not associate the commit's author/committer with a GitHub user. This repository is **private on a personal account**, and Vercel does not support collaboration on private repositories without Pro, so every commit covered by a deployment must be authored with an email linked to the GitHub account that owns the project. The repository-local identity is already configured correctly:
+   ```bash
+   git config user.name "Shanwazmojaloy"
+   git config user.email "251733208+Shanwazmojaloy@users.noreply.github.com"
+   ```
+   Agent/bot identities such as `agent@arena.ai` are not linked to a GitHub user and will block the deployment (commit `9b9cc41c` on `main` is an example). If the identity is right and the block persists, reconnect GitHub under [Vercel Account Settings → Authentication](https://vercel.com/account/settings/authentication), which repairs a stale GitHub↔Vercel account mapping.
 
 ## Checks & Verification
 
