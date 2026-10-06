@@ -38,7 +38,11 @@ SUPABASE_SERVICE_ROLE_KEY=
 # HGO_LEDGER_PATH=/path/to/custom-lead-ledger.json
 ```
 
+Do **not** set `NODE_ENV` or `NPM_CONFIG_PRODUCTION` / `NPM_CONFIG_OMIT` as project environment variables. `NODE_ENV=production` makes `npm install` skip `devDependencies` (Tailwind, TypeScript, ESLint), and any non-`production` `NODE_ENV` breaks the React production build. Vercel and Next.js both set the correct value themselves.
+
 ## Running Locally
+
+Node.js **22.x** is the supported runtime (pinned in `package.json` under `engines.node` and in `.nvmrc`).
 
 ```bash
 npm ci
@@ -55,26 +59,51 @@ npm run dev
 
 ## Production Deployment on Vercel
 
-1. **Framework & Output (pinned in `vercel.json`):** This repo ships a `vercel.json` that forces the **Next.js** framework preset, runs `npm run build`, and uses `.next` as the output directory. These file settings take precedence over Project Settings, which fixes the `No Output Directory named "public" found` failure that occurs when a project is detected as a static ("Other") site.
+1. **Framework & Output (pinned in `vercel.json`):** This repo ships a `vercel.json` that forces the **Next.js** framework preset, runs `npm run build`, pins `installCommand` to `npm install --include=dev`, and uses `.next` as the output directory. These file settings take precedence over Project Settings, which fixes the `No Output Directory named "public" found` failure that occurs when a project is detected as a static ("Other") site.
 2. **Dashboard checklist (Settings > General > Build and Development Settings):** Framework Preset should be **Next.js**, Root Directory should be `./` (repo root), and Build Command / Output Directory / Install Command should be left at their defaults (or match `vercel.json`). If `public` was ever typed into Output Directory manually, clear it back to the default.
-3. **Node.js Engine:** The project targets Next.js 16.3.8 and requires Node.js >= 20.9.0. This is declared in `package.json` under `engines.node`.
-4. **Environment Variables:** In the Vercel Dashboard under **Settings > Environment Variables**, ensure `HGO_APP_SECRET` and `OPS_PASSWORD` are configured.
-5. **Database Migration:** If using Supabase (`https://gvjxjsjwuweecilcqqhb.supabase.co`), run `supabase/migrations/20261005000000_leads_schema.sql` in the Supabase SQL editor and supply `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to Vercel.
-6. **Vercel CLI Inspection:** To link or inspect remote deployment logs locally:
+3. **Node.js Version:** `engines.node` is pinned to `22.x`. Set **Settings > General > Node.js Version** to **22.x** as well so the dashboard and the manifest agree, and so a future Node.js major cannot silently change the build runtime. The previous open-ended `">=20.9.0"` range produced the `Detected "engines": { "node": ">=20.9.0" } ... that will automatically upgrade when a new major Node.js Version is released` warning on every build.
+4. **Install-script approvals:** Newer npm releases block dependency lifecycle scripts unless they are listed in `package.json` under `allowScripts`, which produces the `1 package has install scripts not yet covered by allowScripts` warning. `unrs-resolver@1.11.1` (used by ESLint's TypeScript import resolver) is approved in this repo. Review the current state with `npm install-scripts ls` and approve deliberately with `npm install-scripts approve <pkg>` — never `--all`.
+5. **Environment Variables:** In the Vercel Dashboard under **Settings > Environment Variables**, ensure `HGO_APP_SECRET` and `OPS_PASSWORD` are configured.
+6. **Database Migration:** If using Supabase (`https://gvjxjsjwuweecilcqqhb.supabase.co`), run `supabase/migrations/20261005000000_leads_schema.sql` in the Supabase SQL editor and supply `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to Vercel.
+7. **Deployment Protection:** Protected deployments return a Vercel login page instead of the site. If `/` is meant to be publicly reachable, confirm **Settings > Deployment Protection** only applies to Preview (`Standard Protection`), not to Production.
+8. **Vercel CLI Inspection:** To link or inspect remote deployment logs locally:
    ```bash
    npx vercel link
+   npx vercel inspect <deployment-id-or-url> --logs
+   ```
+
+## Troubleshooting a Failed Deployment
+
+Vercel reports a failed deployment on the project's **Deployments** page. The warnings shown in the summary (Node.js engine notice, `allowScripts` notice) are **not** the cause of a failure — the actual error is further down.
+
+1. Open the failed deployment, expand the **Building** accordion, and scroll to the red `Error` line. Use the command Vercel prints in the GitHub commit status:
+   ```bash
    npx vercel inspect <deployment-id> --logs
    ```
+2. Reproduce the same failure locally first — the CI job runs exactly the same sequence:
+   ```bash
+   npm ci --include=dev
+   npm run verify
+   ```
+3. If the build passes locally and in CI, the failure is configuration rather than code. In order of likelihood:
+   - **Stale build cache:** Deployments > select the last good deployment > **Redeploy** and *uncheck* "Use existing Build Cache".
+   - **Project Settings drift:** Framework Preset not **Next.js**, an Output Directory such as `public`, or a build command that does not match `vercel.json`.
+   - **Install skipped dev dependencies:** see the `NODE_ENV` / `NPM_CONFIG_PRODUCTION` note above.
+   - **Environment variables:** `HGO_APP_SECRET` must be at least 32 bytes and `OPS_PASSWORD` at least 16 characters, otherwise the operator routes refuse to start (`/ops` shows the configuration notice instead of the sign-in form).
+4. If a build fails with **no build logs at all**, Vercel prevented the build from starting — an invalid `vercel.json`, an ignored build step, or a commit author without access to the project's Git connection.
 
 ## Checks & Verification
 
 ```bash
-npm run test       # Vitest suite (48 tests covering domain, tokens, replay, file & Supabase stores)
-npm run typecheck  # Strict TypeScript check
 npm run lint       # ESLint check
+npm run typecheck  # Strict TypeScript check
+npm run test       # Vitest suite (48 tests covering domain, tokens, replay, file & Supabase stores)
 npm run build      # Next.js production build (Turbopack)
+npm run verify     # All of the above, in order (used by CI)
 npm audit --omit=dev # Production dependency audit (0 vulnerabilities)
 ```
+
+`.github/workflows/ci.yml` runs `npm ci --include=dev`, `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build` on Node 22.x for every push and pull request, so a clean-environment build is verified before Vercel builds it again.
 
 ## Stack
 
@@ -83,3 +112,4 @@ npm audit --omit=dev # Production dependency audit (0 vulnerabilities)
 - **Language:** TypeScript 5 (strict mode)
 - **Styling:** Tailwind CSS v4 with system font stack (no Google Fonts egress)
 - **Testing:** Vitest 5.0.3
+- **Runtime:** Node.js 22.x
