@@ -10,7 +10,7 @@ The architecture enforces strict data boundaries: aggregate-first property analy
 - `/hotelgrowthOS` — permanent compatibility redirect to `/` for the existing project URL.
 - `/contact` — server-validated consultation intake form with an expiring HMAC-signed form token, explicit permission-to-reply consent, field boundaries/normalization, and an anti-spam honeypot.
 - `/ops` — single-operator sign-in using server-configured password authentication and signed session cookies (`HttpOnly`, `SameSite=Lax`, `Secure` in production).
-- `/ops/leads` — authenticated, read-only consultation inbox. Every request is verified server-side.
+- `/ops/leads` — authenticated consultation inbox with lead reconciliation. Every request is verified server-side. Operators can mark leads as reconciled with an optional note; all operator actions are written to an audit log.
 - **Production Storage Adapters:**
   - **Supabase PostgreSQL Ledger** (`SupabaseLeadStore`): Activated when `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are provided. Supports multi-instance serverless deployments, idempotent deduplication, and PostgreSQL Row-Level Security (RLS). Schema is located in `supabase/migrations/20261005000000_leads_schema.sql`.
   - **Local File Ledger** (`FileLeadStore`): Fallback for local development or preview environments (`.local/lead-ledger.json` or `/tmp/lead-ledger.json` in serverless environments). Written atomically with restrictive permissions.
@@ -118,7 +118,7 @@ Vercel reports a failed deployment on the project's **Deployments** page. The wa
 ```bash
 npm run lint       # ESLint check
 npm run typecheck  # Strict TypeScript check
-npm run test       # Vitest suite (59 tests: domain, tokens, replay, file & Supabase stores, deploy config)
+npm run test       # Vitest suite (65 tests: domain, tokens, replay, file & Supabase stores, deploy config, reconciliation)
 npm run build      # Next.js production build (Turbopack)
 npm run verify     # All of the above, in order (used by CI)
 npm audit --omit=dev # Production dependency audit (0 vulnerabilities)
@@ -133,6 +133,6 @@ npm audit --omit=dev # Production dependency audit (0 vulnerabilities)
 - **Framework:** Next.js 16.3.8 (App Router, Turbopack)
 - **UI:** React 19.2.4
 - **Language:** TypeScript 5 (strict mode)
-- **Styling:** Tailwind CSS v4 with system font stack (no Google Fonts egress)
+- **Styling:** Tailwind CSS v4 with Instrument Serif editorial typeface (Google Fonts)
 - **Testing:** Vitest 5.0.3
 - **Runtime:** Node.js 24.x

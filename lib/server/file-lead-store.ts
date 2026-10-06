@@ -7,6 +7,9 @@ import type {
   LeadEvent,
   LeadRecord,
   LeadStore,
+  OperatorAuditAction,
+  OperatorAuditEntry,
+  ReconcileLeadInput,
 } from "../domain/lead-ledger";
 
 const LEDGER_VERSION = 1;
@@ -20,6 +23,7 @@ interface LedgerDocument {
   version: typeof LEDGER_VERSION;
   leads: StoredLead[];
   events: LeadEvent[];
+  auditLog: OperatorAuditEntry[];
 }
 
 const lockTails = new Map<string, Promise<void>>();
@@ -43,7 +47,7 @@ async function withFileLock<T>(filePath: string, operation: () => Promise<T>): P
 }
 
 function emptyLedger(): LedgerDocument {
-  return { version: LEDGER_VERSION, leads: [], events: [] };
+  return { version: LEDGER_VERSION, leads: [], events: [], auditLog: [] };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -75,9 +79,12 @@ function isStoredLead(value: unknown): value is StoredLead {
     isNullableString(value.role) &&
     isNullableString(value.hotelWebsite) &&
     isString(value.message) &&
-    value.status === "new" &&
+    (value.status === "new" || value.status === "reconciled") &&
     isIsoDate(value.receivedAt) &&
-    isIsoDate(value.contactPermissionGrantedAt)
+    isIsoDate(value.contactPermissionGrantedAt) &&
+    (value.reconciledAt === null || value.reconciledAt === undefined || isIsoDate(value.reconciledAt)) &&
+    (value.reconciledBy === null || value.reconciledBy === undefined || isString(value.reconciledBy)) &&
+    (value.reconciliationNote === null || value.reconciliationNote === undefined || isString(value.reconciliationNote))
   );
 }
 
@@ -88,6 +95,17 @@ function isLeadEvent(value: unknown): value is LeadEvent {
     (value.type === "lead.created" || value.type === "lead.duplicate") &&
     isString(value.leadId) &&
     isString(value.intakeId) &&
+    isIsoDate(value.occurredAt)
+  );
+}
+
+function isAuditEntry(value: unknown): value is OperatorAuditEntry {
+  if (!isRecord(value)) return false;
+  return (
+    isString(value.id) &&
+    isString(value.action) &&
+    (value.operatorId === null || value.operatorId === undefined || isString(value.operatorId)) &&
+    (value.leadId === null || value.leadId === undefined || isString(value.leadId)) &&
     isIsoDate(value.occurredAt)
   );
 }
@@ -103,7 +121,11 @@ function parseLedger(value: unknown): LedgerDocument {
   ) {
     throw new Error("The local lead ledger is invalid; refusing to overwrite it.");
   }
-  return value as unknown as LedgerDocument;
+  // Backward compatibility: migrate ledgers without auditLog
+  const auditLog = Array.isArray(value.auditLog) && value.auditLog.every(isAuditEntry)
+    ? (value.auditLog as OperatorAuditEntry[])
+    : [];
+  return { ...(value as Omit<LedgerDocument, "auditLog">), auditLog };
 }
 
 function publicLead(lead: StoredLead): LeadRecord {
@@ -118,6 +140,9 @@ function publicLead(lead: StoredLead): LeadRecord {
     status: lead.status,
     receivedAt: lead.receivedAt,
     contactPermissionGrantedAt: lead.contactPermissionGrantedAt,
+    reconciledAt: lead.reconciledAt ?? null,
+    reconciledBy: lead.reconciledBy ?? null,
+    reconciliationNote: lead.reconciliationNote ?? null,
   };
 }
 
@@ -231,6 +256,9 @@ export class FileLeadStore implements LeadStore {
         status: "new",
         receivedAt: occurredAt,
         contactPermissionGrantedAt: occurredAt,
+        reconciledAt: null,
+        reconciledBy: null,
+        reconciliationNote: null,
       };
       ledger.leads.push(lead);
       ledger.events.push({
@@ -255,5 +283,50 @@ export class FileLeadStore implements LeadStore {
   async listEvents(): Promise<LeadEvent[]> {
     const ledger = await this.readLedger();
     return ledger.events.map((event) => ({ ...event }));
+  }
+
+  async reconcileLead(input: ReconcileLeadInput): Promise<LeadRecord> {
+    const occurredAt = toIsoDate(input.now);
+
+    return withFileLock(this.filePath, async () => {
+      const ledger = await this.readLedger();
+      const lead = ledger.leads.find((entry) => entry.id === input.leadId);
+      if (!lead) {
+        throw new Error(`Lead ${input.leadId} not found for reconciliation.`);
+      }
+
+      lead.status = "reconciled";
+      lead.reconciledAt = occurredAt;
+      lead.reconciledBy = input.operatorId;
+      lead.reconciliationNote = input.note ?? null;
+
+      await this.writeLedger(ledger);
+      return publicLead(lead);
+    });
+  }
+
+  async logAuditEvent(
+    action: OperatorAuditAction,
+    context: {
+      operatorId?: string;
+      leadId?: string;
+      detail?: Record<string, unknown>;
+      now?: number;
+    } = {},
+  ): Promise<void> {
+    const occurredAt = toIsoDate(context.now);
+
+    return withFileLock(this.filePath, async () => {
+      const ledger = await this.readLedger();
+      ledger.auditLog.push({
+        id: randomUUID(),
+        action,
+        operatorId: context.operatorId ?? null,
+        leadId: context.leadId ?? null,
+        detail: context.detail ?? null,
+        occurredAt,
+      });
+      await this.writeLedger(ledger);
+    });
   }
 }

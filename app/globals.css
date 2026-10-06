@@ -1989,6 +1989,92 @@ textarea:focus-visible {
   }
 }
 
+/* ---- Reconciliation UI ---- */
+
+.request-card--reconciled {
+  border-color: #d4e0d3;
+  background: #f8faf7;
+}
+
+.request-status--reconciled {
+  border-color: #c4dbc2;
+  background: #edf5eb;
+  color: #3b6a3e;
+}
+
+.request-card__reconciliation {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #edede6;
+  color: #3b6a3e;
+  font-size: 0.63rem;
+  line-height: 1.5;
+}
+
+.request-card__actions {
+  padding-top: 0.75rem;
+  border-top: 1px solid #edede6;
+}
+
+.reconcile-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.reconcile-note-input {
+  min-width: 0;
+  flex: 1;
+  min-height: 2.1rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 0.3rem;
+  background: var(--white);
+  color: var(--ink);
+  font-size: 0.7rem;
+}
+
+.reconcile-note-input::placeholder {
+  color: #a2a9a1;
+}
+
+.reconcile-note-input:focus-visible {
+  outline: 3px solid #d67a5d;
+  outline-offset: 2px;
+  border-color: transparent;
+}
+
+.reconcile-button {
+  min-height: 2.1rem;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.7rem;
+  flex: 0 0 auto;
+}
+
+.reconcile-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 99px;
+  font-size: 0.62rem;
+  font-weight: 600;
+}
+
+.reconcile-badge--done {
+  background: #edf5eb;
+  color: #3b6a3e;
+}
+
+.reconcile-error {
+  width: 100%;
+  color: #833c2c;
+  font-size: 0.62rem;
+}
+
 /* ---- Not Found Page ---- */
 
 .not-found-page {

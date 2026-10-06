@@ -15,3 +15,11 @@ export type OperatorLoginState =
   | { status: "unavailable" };
 
 export const INITIAL_OPERATOR_LOGIN_STATE: OperatorLoginState = { status: "idle" };
+
+export type ReconcileActionState =
+  | { status: "idle" }
+  | { status: "success"; leadId: string }
+  | { status: "unauthorized" }
+  | { status: "error"; message: string };
+
+export const INITIAL_RECONCILE_STATE: ReconcileActionState = { status: "idle" };

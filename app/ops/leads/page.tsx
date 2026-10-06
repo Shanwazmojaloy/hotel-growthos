@@ -6,6 +6,7 @@ import type { LeadRecord } from "../../../lib/domain/lead-ledger";
 import { getOperatorSession } from "../../../lib/server/operator-auth";
 import { createDefaultLeadStore } from "../../../lib/server/runtime-config";
 import { logoutOperatorAction } from "../actions";
+import { ReconcileButton } from "./reconcile-button";
 
 export const metadata: Metadata = {
   title: "Request inbox",
@@ -21,8 +22,10 @@ function formatReceivedAt(value: string): string {
 }
 
 function RequestCard({ lead }: { lead: LeadRecord }) {
+  const isReconciled = lead.status === "reconciled";
+
   return (
-    <article className="request-card">
+    <article className={`request-card${isReconciled ? " request-card--reconciled" : ""}`}>
       <div className="request-card__top">
         <div className="request-card__identity">
           <span className="request-avatar" aria-hidden="true">
@@ -33,10 +36,17 @@ function RequestCard({ lead }: { lead: LeadRecord }) {
             <p>{lead.email}</p>
           </div>
         </div>
-        <span className="request-status">
-          <span className="status-dot" aria-hidden="true" />
-          New request
-        </span>
+        {isReconciled ? (
+          <span className="request-status request-status--reconciled">
+            <span className="status-dot" aria-hidden="true" />
+            Reconciled
+          </span>
+        ) : (
+          <span className="request-status">
+            <span className="status-dot" aria-hidden="true" />
+            New request
+          </span>
+        )}
       </div>
       <div className="request-card__details">
         <div>
@@ -66,6 +76,19 @@ function RequestCard({ lead }: { lead: LeadRecord }) {
         <span className="consent-check" aria-hidden="true">✓</span>
         Permission to reply recorded · {formatReceivedAt(lead.contactPermissionGrantedAt)} UTC
       </div>
+      {isReconciled ? (
+        <div className="request-card__reconciliation">
+          <span className="consent-check" aria-hidden="true">✓</span>
+          <span>
+            Reconciled {lead.reconciledAt ? `· ${formatReceivedAt(lead.reconciledAt)} UTC` : ""}
+            {lead.reconciliationNote ? ` · ${lead.reconciliationNote}` : ""}
+          </span>
+        </div>
+      ) : (
+        <div className="request-card__actions">
+          <ReconcileButton leadId={lead.id} />
+        </div>
+      )}
     </article>
   );
 }
@@ -77,8 +100,16 @@ export default async function LeadsPage() {
 
   let leads: LeadRecord[] = [];
   let ledgerUnavailable = false;
+  const store = createDefaultLeadStore();
   try {
-    leads = await createDefaultLeadStore().listLeads();
+    leads = await store.listLeads();
+    if (store.logAuditEvent) {
+      await store.logAuditEvent("leads.viewed", {
+        operatorId: session.sessionId,
+      }).catch(() => {
+        // Audit logging is non-critical; silently continue on failure.
+      });
+    }
   } catch {
     ledgerUnavailable = true;
   }

@@ -5,6 +5,7 @@ import type {
   LeadEvent,
   LeadRecord,
   LeadStore,
+  OperatorAuditAction,
 } from "../domain/lead-ledger";
 
 interface SupabaseLeadRow {
@@ -19,6 +20,9 @@ interface SupabaseLeadRow {
   status: string;
   received_at: string;
   contact_permission_granted_at: string;
+  reconciled_at: string | null;
+  reconciled_by: string | null;
+  reconciliation_note: string | null;
 }
 
 interface SupabaseEventRow {
@@ -52,9 +56,12 @@ function rowToLeadRecord(row: SupabaseLeadRow): LeadRecord {
     role: row.role ?? null,
     hotelWebsite: row.hotel_website ?? null,
     message: row.message,
-    status: "new",
+    status: row.status === "reconciled" ? "reconciled" : "new",
     receivedAt: row.received_at,
     contactPermissionGrantedAt: row.contact_permission_granted_at,
+    reconciledAt: row.reconciled_at ?? null,
+    reconciledBy: row.reconciled_by ?? null,
+    reconciliationNote: row.reconciliation_note ?? null,
   };
 }
 
@@ -206,5 +213,70 @@ export class SupabaseLeadStore implements LeadStore {
       intakeId: row.intake_id,
       occurredAt: row.occurred_at,
     }));
+  }
+
+  async reconcileLead(input: {
+    leadId: string;
+    operatorId: string;
+    note?: string;
+    now?: number;
+  }): Promise<LeadRecord> {
+    const occurredAt = toIsoDate(input.now);
+
+    const patchUrl = `${this.baseUrl}/rest/v1/leads?id=eq.${encodeURIComponent(input.leadId)}`;
+    const patchRes = await this.fetcher(patchUrl, {
+      method: "PATCH",
+      headers: this.headers({ Prefer: "return=representation" }),
+      body: JSON.stringify({
+        status: "reconciled",
+        reconciled_at: occurredAt,
+        reconciled_by: input.operatorId,
+        reconciliation_note: input.note ?? null,
+      }),
+    });
+
+    if (!patchRes.ok) {
+      throw new Error(
+        `Failed to reconcile lead in Supabase: ${patchRes.status} ${patchRes.statusText}`,
+      );
+    }
+
+    const rows = (await patchRes.json()) as SupabaseLeadRow[];
+    if (rows.length === 0) {
+      throw new Error(`Lead ${input.leadId} not found for reconciliation.`);
+    }
+
+    return rowToLeadRecord(rows[0]);
+  }
+
+  async logAuditEvent(
+    action: OperatorAuditAction,
+    context: {
+      operatorId?: string;
+      leadId?: string;
+      detail?: Record<string, unknown>;
+      now?: number;
+    } = {},
+  ): Promise<void> {
+    const occurredAt = toIsoDate(context.now);
+
+    const res = await this.fetcher(`${this.baseUrl}/rest/v1/operator_audit_log`, {
+      method: "POST",
+      headers: this.headers({ Prefer: "return=minimal" }),
+      body: JSON.stringify({
+        id: randomUUID(),
+        action,
+        operator_id: context.operatorId ?? null,
+        lead_id: context.leadId ?? null,
+        detail: context.detail ?? null,
+        occurred_at: occurredAt,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error(
+        `Failed to write audit event to Supabase: ${res.status} ${res.statusText}`,
+      );
+    }
   }
 }
